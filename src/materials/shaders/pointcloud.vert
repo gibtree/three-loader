@@ -18,6 +18,7 @@ attribute float numberOfReturns;
 attribute float pointSourceID;
 attribute vec4 indices;
 attribute vec2 uv;
+attribute float cqa_id;
 
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
@@ -315,12 +316,19 @@ float getContrastFactor(float contrast) {
 }
 
 vec3 getRGB() {
-	
 	#ifdef color_rgba
 		vec3 rgb = rgba.rgb;
 	#else	
 		vec3 rgb = color;
 	#endif		
+	
+	if (cqa_id > -1.0) {
+		return vec3(1.0, 0.0, 0.0);
+	} else {
+		return rgb;
+		// return vec3(0.0, 1.0, 1.0);
+	}
+	
 
 	#if defined(use_rgb_gamma_contrast_brightness)
 		rgb = pow(rgb, vec3(rgbGamma));
