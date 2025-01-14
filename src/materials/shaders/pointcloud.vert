@@ -19,6 +19,7 @@ attribute float pointSourceID;
 attribute vec4 indices;
 attribute vec2 uv;
 attribute float cqa_id;
+attribute float class_id;
 
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
@@ -325,6 +326,28 @@ vec3 getRGB() {
 	if (cqa_id > -1.0) {
 		return vec3(1.0, 0.0, 0.0);
 	} else {
+		// Unclassified
+		if (class_id == -1.0) {
+			return vec3(1.0, 0.0, 0.0);
+		// Other (probably ground) rgb(139,69,19)
+		} else if (class_id == 0.0) {
+			return vec3(0.55, 0.27, 0.07);
+		// Veg (probably tree) rgb(34,139,34)
+		} else if (class_id == 1.0) {
+			return vec3(0.133, 0.55, 0.133);
+		} else if (class_id == 2.0) {
+		// Wire rgb(34,139,34)
+			return vec3(0.98, 0.98, 0.94);
+		} else if (class_id == 3.0) {
+		// Pole rgb(255,248,220)
+			return vec3(1.0, 0.97, 0.86);
+		} else if (class_id == 4.0) {
+		// House rgb(70,130,180)
+			return vec3(0.274, 0.509, 0.705);
+		} else if (class_id == 5.0) {
+		// Noise rgb(72,61,139)
+			return vec3(0.282, 0.239, 0.545);
+		}
 		return rgb;
 		// return vec3(0.0, 1.0, 1.0);
 	}
