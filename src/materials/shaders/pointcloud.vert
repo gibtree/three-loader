@@ -7,7 +7,7 @@ attribute vec3 position;
 attribute vec3 color;
 
 #ifdef color_rgba
-	attribute vec4 rgba;
+attribute vec4 rgba;
 #endif
 
 attribute vec3 normal;
@@ -20,6 +20,7 @@ attribute vec4 indices;
 attribute vec2 uv;
 attribute float cqa_id;
 attribute float class_id;
+attribute float span_id;
 
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
@@ -35,7 +36,7 @@ uniform float fov;
 uniform float spacing;
 
 #if defined use_clip_box
-	uniform mat4 clipBoxes[max_clip_boxes];
+uniform mat4 clipBoxes[max_clip_boxes];
 #endif
 
 uniform float heightMin;
@@ -75,59 +76,59 @@ uniform sampler2D classificationLUT;
 uniform sampler2D depthMap;
 
 #ifdef use_texture_blending
-	uniform sampler2D backgroundMap;
+uniform sampler2D backgroundMap;
 #endif
 
 #ifdef use_point_cloud_mixing
-	uniform int pointCloudMixingMode;
-	uniform float pointCloudID;
+uniform int pointCloudMixingMode;
+uniform float pointCloudID;
 
-	uniform float pointCloudMixAngle;
-	uniform float stripeDistanceX;
-	uniform float stripeDistanceY;
+uniform float pointCloudMixAngle;
+uniform float stripeDistanceX;
+uniform float stripeDistanceY;
 
-	uniform float stripeDivisorX;
-	uniform float stripeDivisorY;
+uniform float stripeDivisorX;
+uniform float stripeDivisorY;
 #endif
 
 #ifdef highlight_point
-	uniform vec3 highlightedPointCoordinate;
-	uniform bool enablePointHighlighting;
-	uniform float highlightedPointScale;
+uniform vec3 highlightedPointCoordinate;
+uniform bool enablePointHighlighting;
+uniform float highlightedPointScale;
 #endif
 
 #ifdef use_filter_by_normal
-	uniform int normalFilteringMode;
+uniform int normalFilteringMode;
 #endif
 
 varying vec3 vColor;
 
 #if !defined(color_type_point_index)
-	varying float vOpacity;
+varying float vOpacity;
 #endif
 
 #if defined(weighted_splats)
-	varying float vLinearDepth;
+varying float vLinearDepth;
 #endif
 
 #if !defined(paraboloid_point_shape) && defined(use_edl)
-	varying float vLogDepth;
+varying float vLogDepth;
 #endif
 
 #if defined(color_type_phong) && (MAX_POINT_LIGHTS > 0 || MAX_DIR_LIGHTS > 0) || defined(paraboloid_point_shape)
-	varying vec3 vViewPosition;
+varying vec3 vViewPosition;
 #endif
 
 #if defined(weighted_splats) || defined(paraboloid_point_shape)
-	varying float vRadius;
+varying float vRadius;
 #endif
 
 #if defined(color_type_phong) && (MAX_POINT_LIGHTS > 0 || MAX_DIR_LIGHTS > 0)
-	varying vec3 vNormal;
+varying vec3 vNormal;
 #endif
 
 #ifdef highlight_point
-	varying float vHighlight;
+varying float vHighlight;
 #endif
 
 // ---------------------
@@ -139,7 +140,7 @@ varying vec3 vColor;
 /**
  * Rounds the specified number to the closest integer.
  */
-float round(float number){
+float round(float number) {
 	return floor(number + 0.5);
 }
 
@@ -151,12 +152,12 @@ float round(float number){
 int numberOfOnes(int number, int index) {
 	int numOnes = 0;
 	int tmp = 128;
-	for (int i = 7; i >= 0; i--) {
+	for(int i = 7; i >= 0; i--) {
 
-		if (number >= tmp) {
+		if(number >= tmp) {
 			number = number - tmp;
 
-			if (i <= index) {
+			if(i <= index) {
 				numOnes++;
 			}
 		}
@@ -172,25 +173,25 @@ int numberOfOnes(int number, int index) {
  *
  * number is treated as if it were an integer in the range 0-255
  */
-bool isBitSet(int number, int index){
+bool isBitSet(int number, int index) {
 
 	// weird multi else if due to lack of proper array, int and bitwise support in WebGL 1.0
 	int powi = 1;
-	if (index == 0) {
+	if(index == 0) {
 		powi = 1;
-	} else if (index == 1) {
+	} else if(index == 1) {
 		powi = 2;
-	} else if (index == 2) {
+	} else if(index == 2) {
 		powi = 4;
-	} else if (index == 3) {
+	} else if(index == 3) {
 		powi = 8;
-	} else if (index == 4) {
+	} else if(index == 4) {
 		powi = 16;
-	} else if (index == 5) {
+	} else if(index == 5) {
 		powi = 32;
-	} else if (index == 6) {
+	} else if(index == 6) {
 		powi = 64;
-	} else if (index == 7) {
+	} else if(index == 7) {
 		powi = 128;
 	}
 
@@ -207,17 +208,17 @@ float getLOD() {
 	int iOffset = int(vnStart);
 	float depth = level;
 
-	for (float i = 0.0; i <= 30.0; i++) {
-		float nodeSizeAtLevel = octreeSize  / pow(2.0, i + level + 0.0);
+	for(float i = 0.0; i <= 30.0; i++) {
+		float nodeSizeAtLevel = octreeSize / pow(2.0, i + level + 0.0);
 
-		vec3 index3d = (position-offset) / nodeSizeAtLevel;
+		vec3 index3d = (position - offset) / nodeSizeAtLevel;
 		index3d = floor(index3d + 0.5);
 		int index = int(round(4.0 * index3d.x + 2.0 * index3d.y + index3d.z));
 
 		vec4 value = texture2D(visibleNodes, vec2(float(iOffset) / 2048.0, 0.0));
 		int mask = int(round(value.r * 255.0));
 
-		if (isBitSet(mask, index)) {
+		if(isBitSet(mask, index)) {
 			// there are more visible child nodes at this position
 			int advanceG = int(round(value.g * 255.0)) * 256;
 			int advanceB = int(round(value.b * 255.0));
@@ -257,7 +258,7 @@ float getLOD() {
 	vec3 size = bbSize;
 	vec3 pos = position;
 
-	for (float i = 0.0; i <= 1000.0; i++) {
+	for(float i = 0.0; i <= 1000.0; i++) {
 
 		vec4 value = texture2D(visibleNodes, vec2(intOffset / 2048.0, 0.0));
 
@@ -265,34 +266,34 @@ float getLOD() {
 		float next = value.g * 255.0;
 		int split = int(value.b * 255.0);
 
-		if (next == 0.0) {
-		 	return depth;
+		if(next == 0.0) {
+			return depth;
 		}
 
 		vec3 splitv = vec3(0.0, 0.0, 0.0);
-		if (split == 1) {
+		if(split == 1) {
 			splitv.x = 1.0;
-		} else if (split == 2) {
-		 	splitv.y = 1.0;
-		} else if (split == 4) {
-		 	splitv.z = 1.0;
+		} else if(split == 2) {
+			splitv.y = 1.0;
+		} else if(split == 4) {
+			splitv.z = 1.0;
 		}
 
 		intOffset = intOffset + next;
 
 		float factor = length(pos * splitv / size);
-		if (factor < 0.5) {
+		if(factor < 0.5) {
 		 	// left
-			if (children == 0 || children == 2) {
+			if(children == 0 || children == 2) {
 				return depth;
 			}
 		} else {
 			// right
 			pos = pos - size * splitv * 0.5;
-			if (children == 0 || children == 1) {
+			if(children == 0 || children == 1) {
 				return depth;
 			}
-			if (children == 3) {
+			if(children == 3) {
 				intOffset = intOffset + 1.0;
 			}
 		}
@@ -300,7 +301,6 @@ float getLOD() {
 
 		depth++;
 	}
-
 
 	return depth;
 }
@@ -318,49 +318,50 @@ float getContrastFactor(float contrast) {
 
 vec3 getRGB() {
 	#ifdef color_rgba
-		vec3 rgb = rgba.rgb;
+	vec3 rgb = rgba.rgb;
 	#else	
-		vec3 rgb = color;
+	vec3 rgb = color;
 	#endif		
-	
-	if (cqa_id > -1.0) {
+
+	if(cqa_id > -1.0) {
 		return vec3(1.0, 0.0, 0.0);
+	} else if(span_id > 0.0) {
+		return vec3(0.0, 0.0, 0.94);
 	} else {
 		// Unclassified
-		if (class_id == -1.0) {
-			return vec3(1.0, 0.0, 0.0);
+		if(class_id == -1.0) {
+			return vec3(0.282, 0.239, 0.545);
 		// Other (probably ground) rgb(139,69,19)
-		} else if (class_id == 0.0) {
+		} else if(class_id == 0.0) {
 			return vec3(0.55, 0.27, 0.07);
 		// Veg (probably tree) rgb(34,139,34)
-		} else if (class_id == 1.0) {
+		} else if(class_id == 1.0) {
 			return vec3(0.133, 0.55, 0.133);
-		} else if (class_id == 2.0) {
+		} else if(class_id == 2.0) {
 		// Wire rgb(34,139,34)
 			return vec3(0.98, 0.98, 0.94);
-		} else if (class_id == 3.0) {
+		} else if(class_id == 3.0) {
 		// Pole rgb(255,248,220)
 			return vec3(1.0, 0.97, 0.86);
-		} else if (class_id == 4.0) {
+		} else if(class_id == 4.0) {
 		// House rgb(70,130,180)
 			return vec3(0.274, 0.509, 0.705);
-		} else if (class_id == 5.0) {
+		} else if(class_id == 5.0) {
 		// Noise rgb(72,61,139)
 			return vec3(0.282, 0.239, 0.545);
 		}
 		return rgb;
 		// return vec3(0.0, 1.0, 1.0);
 	}
-	
 
 	#if defined(use_rgb_gamma_contrast_brightness)
-		rgb = pow(rgb, vec3(rgbGamma));
-		rgb = rgb + rgbBrightness;
-		rgb = (rgb - 0.5) * getContrastFactor(rgbContrast) + 0.5;
-		rgb = clamp(rgb, 0.0, 1.0);
-		return rgb;
+	rgb = pow(rgb, vec3(rgbGamma));
+	rgb = rgb + rgbBrightness;
+	rgb = (rgb - 0.5) * getContrastFactor(rgbContrast) + 0.5;
+	rgb = clamp(rgb, 0.0, 1.0);
+	return rgb;
 	#else
-		return rgb;
+	return rgb;
 	#endif
 }
 
@@ -375,9 +376,9 @@ float getIntensity() {
 }
 
 vec3 getElevation() {
-	vec4 world = modelMatrix * vec4( position, 1.0 );
-	float w = (world.z - heightMin) / (heightMax-heightMin);
-	vec3 cElevation = texture2D(gradient, vec2(w,1.0-w)).rgb;
+	vec4 world = modelMatrix * vec4(position, 1.0);
+	float w = (world.z - heightMin) / (heightMax - heightMin);
+	vec3 cElevation = texture2D(gradient, vec2(w, 1.0 - w)).rgb;
 
 	return cElevation;
 }
@@ -390,12 +391,12 @@ vec4 getClassification() {
 }
 
 vec3 getReturnNumber() {
-	if (numberOfReturns == 1.0) {
+	if(numberOfReturns == 1.0) {
 		return vec3(1.0, 1.0, 0.0);
 	} else {
-		if (returnNumber == 1.0) {
+		if(returnNumber == 1.0) {
 			return vec3(1.0, 0.0, 0.0);
-		} else if (returnNumber == numberOfReturns) {
+		} else if(returnNumber == numberOfReturns) {
 			return vec3(0.0, 0.0, 1.0);
 		} else {
 			return vec3(0.0, 1.0, 0.0);
@@ -433,7 +434,7 @@ vec3 getCompositeColor() {
 
 	c = c / w;
 
-	if (w == 0.0) {
+	if(w == 0.0) {
 		gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
 	}
 
@@ -446,19 +447,19 @@ void main() {
 	gl_Position = projectionMatrix * mvPosition;
 
 	#if defined(color_type_phong) && (MAX_POINT_LIGHTS > 0 || MAX_DIR_LIGHTS > 0) || defined(paraboloid_point_shape)
-		vViewPosition = mvPosition.xyz;
+	vViewPosition = mvPosition.xyz;
 	#endif
 
 	#if defined weighted_splats
-		vLinearDepth = gl_Position.w;
+	vLinearDepth = gl_Position.w;
 	#endif
 
 	#if defined(color_type_phong) && (MAX_POINT_LIGHTS > 0 || MAX_DIR_LIGHTS > 0)
-		vNormal = normalize(normalMatrix * normal);
+	vNormal = normalize(normalMatrix * normal);
 	#endif
 
 	#if !defined(paraboloid_point_shape) && defined(use_edl)
-		vLogDepth = log2(-mvPosition.z);
+	vLogDepth = log2(-mvPosition.z);
 	#endif
 
 	// ---------------------
@@ -467,22 +468,22 @@ void main() {
 
 	float pointSize = 1.0;
 	float slope = tan(fov / 2.0);
-	float projFactor =  -0.5 * screenHeight / (slope * mvPosition.z);
+	float projFactor = -0.5 * screenHeight / (slope * mvPosition.z);
 
 	#if defined fixed_point_size
-		pointSize = size;
+	pointSize = size;
 	#elif defined attenuated_point_size
-		pointSize = size * spacing * projFactor;
+	pointSize = size * spacing * projFactor;
 	#elif defined adaptive_point_size
-		float worldSpaceSize = 2.0 * size * spacing / getPointSizeAttenuation();
-		pointSize = worldSpaceSize * projFactor;
+	float worldSpaceSize = 2.0 * size * spacing / getPointSizeAttenuation();
+	pointSize = worldSpaceSize * projFactor;
 	#endif
 
 	pointSize = max(minSize, pointSize);
 	pointSize = min(maxSize, pointSize);
 
 	#if defined(weighted_splats) || defined(paraboloid_point_shape)
-		vRadius = pointSize / projFactor;
+	vRadius = pointSize / projFactor;
 	#endif
 
 	gl_PointSize = pointSize;
@@ -492,15 +493,15 @@ void main() {
 	// ---------------------
 
 	#ifdef highlight_point
-		vec4 mPosition = modelMatrix * vec4(position, 1.0);
-		if (enablePointHighlighting && abs(mPosition.x - highlightedPointCoordinate.x) < 0.0001 &&
-			abs(mPosition.y - highlightedPointCoordinate.y) < 0.0001 &&
-			abs(mPosition.z - highlightedPointCoordinate.z) < 0.0001) {
-			vHighlight = 1.0;
-			gl_PointSize = pointSize * highlightedPointScale;
-		} else {
-			vHighlight = 0.0;
-		}
+	vec4 mPosition = modelMatrix * vec4(position, 1.0);
+	if(enablePointHighlighting && abs(mPosition.x - highlightedPointCoordinate.x) < 0.0001 &&
+		abs(mPosition.y - highlightedPointCoordinate.y) < 0.0001 &&
+		abs(mPosition.z - highlightedPointCoordinate.z) < 0.0001) {
+		vHighlight = 1.0;
+		gl_PointSize = pointSize * highlightedPointScale;
+	} else {
+		vHighlight = 0.0;
+	}
 	#endif
 
 	// ---------------------
@@ -509,9 +510,9 @@ void main() {
 
 	#ifndef color_type_point_index
 		#ifdef attenuated_opacity
-			vOpacity = opacity * exp(-length(-mvPosition.xyz) / opacityAttenuation);
+	vOpacity = opacity * exp(-length(-mvPosition.xyz) / opacityAttenuation);
 		#else
-			vOpacity = opacity;
+	vOpacity = opacity;
 		#endif
 	#endif
 
@@ -520,24 +521,23 @@ void main() {
 	// ---------------------
 
 	#ifdef use_filter_by_normal
-		bool discardPoint = false;
+	bool discardPoint = false;
 		// Absolute normal filtering
-		if (normalFilteringMode == 1) {
-			discardPoint = (abs((modelViewMatrix * vec4(normal, 0.0)).z) > filterByNormalThreshold);
-		}
+	if(normalFilteringMode == 1) {
+		discardPoint = (abs((modelViewMatrix * vec4(normal, 0.0)).z) > filterByNormalThreshold);
+	}
 		// less than equal to
-		else if (normalFilteringMode == 2) {
-			discardPoint = (modelViewMatrix * vec4(normal, 0.0)).z <= filterByNormalThreshold;
-			}
+	else if(normalFilteringMode == 2) {
+		discardPoint = (modelViewMatrix * vec4(normal, 0.0)).z <= filterByNormalThreshold;
+	}
 		// greater than
-		else if(normalFilteringMode == 3) {
-			discardPoint = (modelViewMatrix * vec4(normal, 0.0)).z > filterByNormalThreshold;
-			}
+	else if(normalFilteringMode == 3) {
+		discardPoint = (modelViewMatrix * vec4(normal, 0.0)).z > filterByNormalThreshold;
+	}
 
-		if (discardPoint)
-		{
-			gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
-		}
+	if(discardPoint) {
+		gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
+	}
 	#endif
 
 	// ---------------------
@@ -545,49 +545,49 @@ void main() {
 	// ---------------------
 
 	#ifdef color_type_rgb
-		vColor = getRGB();
+	vColor = getRGB();
 	#elif defined color_type_height
-		vColor = getElevation();
+	vColor = getElevation();
 	#elif defined color_type_rgb_height
-		vec3 cHeight = getElevation();
-		vColor = (1.0 - transition) * getRGB() + transition * cHeight;
+	vec3 cHeight = getElevation();
+	vColor = (1.0 - transition) * getRGB() + transition * cHeight;
 	#elif defined color_type_depth
-		float linearDepth = -mvPosition.z ;
-		float expDepth = (gl_Position.z / gl_Position.w) * 0.5 + 0.5;
-		vColor = vec3(linearDepth, expDepth, 0.0);
+	float linearDepth = -mvPosition.z;
+	float expDepth = (gl_Position.z / gl_Position.w) * 0.5 + 0.5;
+	vColor = vec3(linearDepth, expDepth, 0.0);
 	#elif defined color_type_intensity
-		float w = getIntensity();
-		vColor = vec3(w, w, w);
+	float w = getIntensity();
+	vColor = vec3(w, w, w);
 	#elif defined color_type_intensity_gradient
-		float w = getIntensity();
-		vColor = texture2D(gradient, vec2(w, 1.0 - w)).rgb;
+	float w = getIntensity();
+	vColor = texture2D(gradient, vec2(w, 1.0 - w)).rgb;
 	#elif defined color_type_color
-		vColor = uColor;
+	vColor = uColor;
 	#elif defined color_type_lod
 	float w = getLOD() / 10.0;
 	vColor = texture2D(gradient, vec2(w, 1.0 - w)).rgb;
 	#elif defined color_type_point_index
-		vColor = indices.rgb;
+	vColor = indices.rgb;
 	#elif defined color_type_classification
-	  vec4 cl = getClassification();
-		vColor = cl.rgb;
+	vec4 cl = getClassification();
+	vColor = cl.rgb;
 	#elif defined color_type_return_number
-		vColor = getReturnNumber();
+	vColor = getReturnNumber();
 	#elif defined color_type_source
-		vColor = getSourceID();
+	vColor = getSourceID();
 	#elif defined color_type_normal
-		vColor = (modelMatrix * vec4(normal, 0.0)).xyz;
+	vColor = (modelMatrix * vec4(normal, 0.0)).xyz;
 	#elif defined color_type_phong
-		vColor = color;
+	vColor = color;
 	#elif defined color_type_composite
-		vColor = getCompositeColor();
+	vColor = getCompositeColor();
 	#endif
 
 	#if !defined color_type_composite && defined color_type_classification
-		if (cl.a == 0.0) {
-			gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
-			return;
-		}
+	if(cl.a == 0.0) {
+		gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
+		return;
+	}
 	#endif
 
 	// ---------------------
@@ -595,29 +595,29 @@ void main() {
 	// ---------------------
 
 	#if defined use_clip_box
-		bool insideAny = false;
-		for (int i = 0; i < max_clip_boxes; i++) {
-			if (i == int(clipBoxCount)) {
-				break;
-			}
-
-			vec4 clipPosition = clipBoxes[i] * modelMatrix * vec4(position, 1.0);
-			bool inside = -0.5 <= clipPosition.x && clipPosition.x <= 0.5;
-			inside = inside && -0.5 <= clipPosition.y && clipPosition.y <= 0.5;
-			inside = inside && -0.5 <= clipPosition.z && clipPosition.z <= 0.5;
-			insideAny = insideAny || inside;
+	bool insideAny = false;
+	for(int i = 0; i < max_clip_boxes; i++) {
+		if(i == int(clipBoxCount)) {
+			break;
 		}
 
-		if (!insideAny) {
+		vec4 clipPosition = clipBoxes[i] * modelMatrix * vec4(position, 1.0);
+		bool inside = -0.5 <= clipPosition.x && clipPosition.x <= 0.5;
+		inside = inside && -0.5 <= clipPosition.y && clipPosition.y <= 0.5;
+		inside = inside && -0.5 <= clipPosition.z && clipPosition.z <= 0.5;
+		insideAny = insideAny || inside;
+	}
+
+	if(!insideAny) {
 			#if defined clip_outside
-				gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 			#elif defined clip_highlight_inside && !defined(color_type_depth)
-				float c = (vColor.r + vColor.g + vColor.b) / 6.0;
+		float c = (vColor.r + vColor.g + vColor.b) / 6.0;
 			#endif
-		} else {
+	} else {
 			#if defined clip_highlight_inside
-				vColor.r += 0.5;
+		vColor.r += 0.5;
 			#endif
-		}
+	}
 	#endif
 }
