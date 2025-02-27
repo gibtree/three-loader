@@ -22,6 +22,7 @@ attribute float cqa_id;
 attribute float class_id;
 attribute float span_id;
 
+uniform float selected_cqa_id;
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -321,9 +322,9 @@ vec3 getRGB() {
 	vec3 rgb = rgba.rgb;
 	#else	
 	vec3 rgb = color;
-	#endif		
+	#endif
 
-	if(cqa_id > -1.0) {
+	if(cqa_id > -1.0 && cqa_id == selected_cqa_id) {
 		return vec3(1.0, 0.0, 0.0);
 	} else if(span_id > 0.0) {
 		return vec3(0.0, 0.0, 0.94);
