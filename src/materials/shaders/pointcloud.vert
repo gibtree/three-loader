@@ -11,15 +11,17 @@ attribute vec4 rgba;
 #endif
 
 attribute vec3 normal;
-attribute float intensity;
-attribute float classification;
-attribute float returnNumber;
-attribute float numberOfReturns;
-attribute float pointSourceID;
+// attribute float intensity;
+// attribute float classification;
+// attribute float returnNumber;
+// attribute float numberOfReturns;
+// attribute float pointSourceID;
 attribute vec4 indices;
 attribute vec2 uv;
 attribute float cqa_id;
+attribute float region_id;
 attribute float class_id;
+attribute float encroachment;
 attribute float span_id;
 
 uniform float selected_cqa_id;
@@ -324,32 +326,34 @@ vec3 getRGB() {
 	vec3 rgb = color;
 	#endif
 
-	if(cqa_id > -1.0 && cqa_id == selected_cqa_id) {
+	if(encroachment < 4.572 && class_id == 1.0 && region_id == selected_cqa_id) {
 		return vec3(1.0, 0.0, 0.0);
+	} else if(encroachment < 4.572 && class_id == 1.0) {
+		return vec3(0.3, 0.0, 0.0);
 	} else if(span_id > 0.0) {
 		return vec3(0.0, 0.0, 0.94);
 	} else {
 		// Unclassified
 		if(class_id == -1.0) {
-			return vec3(0.282, 0.239, 0.545);
+			return vec3(0.50, 0.50, 0.50);
 		// Other (probably ground) rgb(139,69,19)
 		} else if(class_id == 0.0) {
-			return vec3(0.55, 0.27, 0.07);
+			return vec3(0.50, 0.50, 0.50);
 		// Veg (probably tree) rgb(34,139,34)
 		} else if(class_id == 1.0) {
 			return vec3(0.133, 0.55, 0.133);
 		} else if(class_id == 2.0) {
 		// Wire rgb(34,139,34)
-			return vec3(0.98, 0.98, 0.94);
+			return vec3(0.50, 0.50, 0.50);
 		} else if(class_id == 3.0) {
 		// Pole rgb(255,248,220)
-			return vec3(1.0, 0.97, 0.86);
+			return vec3(0.50, 0.50, 0.50);
 		} else if(class_id == 4.0) {
 		// House rgb(70,130,180)
-			return vec3(0.274, 0.509, 0.705);
+			return vec3(0.50, 0.50, 0.50);
 		} else if(class_id == 5.0) {
 		// Noise rgb(72,61,139)
-			return vec3(0.282, 0.239, 0.545);
+			return vec3(0.50, 0.50, 0.50);
 		}
 		return rgb;
 		// return vec3(0.0, 1.0, 1.0);
@@ -366,80 +370,12 @@ vec3 getRGB() {
 	#endif
 }
 
-float getIntensity() {
-	float w = (intensity - intensityRange.x) / (intensityRange.y - intensityRange.x);
-	w = pow(w, intensityGamma);
-	w = w + intensityBrightness;
-	w = (w - 0.5) * getContrastFactor(intensityContrast) + 0.5;
-	w = clamp(w, 0.0, 1.0);
-
-	return w;
-}
-
 vec3 getElevation() {
 	vec4 world = modelMatrix * vec4(position, 1.0);
 	float w = (world.z - heightMin) / (heightMax - heightMin);
 	vec3 cElevation = texture2D(gradient, vec2(w, 1.0 - w)).rgb;
 
 	return cElevation;
-}
-
-vec4 getClassification() {
-	vec2 uv = vec2(classification / 255.0, 0.5);
-	vec4 classColor = texture2D(classificationLUT, uv);
-
-	return classColor;
-}
-
-vec3 getReturnNumber() {
-	if(numberOfReturns == 1.0) {
-		return vec3(1.0, 1.0, 0.0);
-	} else {
-		if(returnNumber == 1.0) {
-			return vec3(1.0, 0.0, 0.0);
-		} else if(returnNumber == numberOfReturns) {
-			return vec3(0.0, 0.0, 1.0);
-		} else {
-			return vec3(0.0, 1.0, 0.0);
-		}
-	}
-}
-
-vec3 getSourceID() {
-	float w = mod(pointSourceID, 10.0) / 10.0;
-	return texture2D(gradient, vec2(w, 1.0 - w)).rgb;
-}
-
-vec3 getCompositeColor() {
-	vec3 c;
-	float w;
-
-	c += wRGB * getRGB();
-	w += wRGB;
-
-	c += wIntensity * getIntensity() * vec3(1.0, 1.0, 1.0);
-	w += wIntensity;
-
-	c += wElevation * getElevation();
-	w += wElevation;
-
-	c += wReturnNumber * getReturnNumber();
-	w += wReturnNumber;
-
-	c += wSourceID * getSourceID();
-	w += wSourceID;
-
-	vec4 cl = wClassification * getClassification();
-	c += cl.a * cl.rgb;
-	w += wClassification * cl.a;
-
-	c = c / w;
-
-	if(w == 0.0) {
-		gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
-	}
-
-	return c;
 }
 
 void main() {
@@ -621,4 +557,11 @@ void main() {
 			#endif
 	}
 	#endif
+
+	if(class_id == 2.0) {
+		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+	}
+	// if(class_id != 1.0) {
+	// 	gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+	// }
 }
