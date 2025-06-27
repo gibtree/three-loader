@@ -113,6 +113,8 @@ export interface IPointCloudMaterialUniforms {
   stripeDivisorY: IUniform<number>;
   pointCloudMixingMode: IUniform<number>;
   selected_cqa_id: IUniform<number>;
+  riskView: IUniform<number>;
+  riskSeverity: IUniform<number>;
 }
 
 const TREE_TYPE_DEFS = {
@@ -248,6 +250,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
     stripeDivisorY: makeUniform('f', 2),
     pointCloudMixAngle: makeUniform('f', 31),
     selected_cqa_id: makeUniform('f', 0),
+    riskView: makeUniform('f', 0),
+    riskSeverity: makeUniform('f', 0),
   };
 
   @uniform('bbSize') bbSize!: [number, number, number];

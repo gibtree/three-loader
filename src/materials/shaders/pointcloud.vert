@@ -22,9 +22,13 @@ attribute float cqa_id;
 attribute float region_id;
 attribute float class_id;
 attribute float encroachment;
+attribute float sp_dist;
 attribute float span_id;
+attribute float instance_id;
 
 uniform float selected_cqa_id;
+uniform float riskView;
+uniform float riskSeverity;
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -326,10 +330,19 @@ vec3 getRGB() {
 	vec3 rgb = color;
 	#endif
 
-	if(encroachment < 4.572 && class_id == 1.0 && region_id == selected_cqa_id) {
+	// if(instance_id == selected_cqa_id) {
+	// 	return vec3(1.0, 0, 0);
+	// }
+
+	if(riskView == 1.0 && encroachment < riskSeverity && class_id == 1.0 && region_id == selected_cqa_id) {
 		return vec3(1.0, 0.0, 0.0);
-	} else if(encroachment < 4.572 && class_id == 1.0) {
-		return vec3(0.3, 0.0, 0.0);
+	} else if(riskView == 1.0 && encroachment < riskSeverity && class_id == 1.0) {
+		return vec3(1.0, 0.00, 0.09);
+		// return vec3(0.5, 0.00, 0.12);
+	} else if(riskView == 2.0 && sp_dist < 0.0 && class_id == 1.0 && region_id == selected_cqa_id) {
+		return vec3(1.0, 0.2, 0.01);
+	} else if(riskView == 2.0 && sp_dist < 0.0 && class_id == 1.0) {
+		return vec3(1.0, 0.2, 0.01);
 	} else if(span_id > 0.0) {
 		return vec3(0.0, 0.0, 0.94);
 	} else {
@@ -558,9 +571,9 @@ void main() {
 	}
 	#endif
 
-	if(class_id == 2.0) {
-		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	}
+	// if(class_id == 2.0) {
+	// 	gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+	// }
 	// if(class_id != 1.0) {
 	// 	gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	// }
