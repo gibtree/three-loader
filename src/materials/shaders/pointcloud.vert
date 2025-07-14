@@ -334,12 +334,14 @@ vec3 getRGB() {
 	// 	return vec3(1.0, 0, 0);
 	// }
 
-	if(riskView == 1.0 && encroachment < riskSeverity && class_id == 1.0 && region_id == selected_cqa_id) {
+	if(riskView == 0.0 && instance_id == selected_cqa_id) {
+		return vec3(0.31, 0.21, 0.87);
+	} else if(riskView == 1.0 && encroachment < riskSeverity && class_id == 1.0 && instance_id == selected_cqa_id) {
 		return vec3(1.0, 0.0, 0.0);
 	} else if(riskView == 1.0 && encroachment < riskSeverity && class_id == 1.0) {
 		return vec3(1.0, 0.00, 0.09);
 		// return vec3(0.5, 0.00, 0.12);
-	} else if(riskView == 2.0 && sp_dist < 0.0 && class_id == 1.0 && region_id == selected_cqa_id) {
+	} else if(riskView == 2.0 && sp_dist < 0.0 && class_id == 1.0 && instance_id == selected_cqa_id) {
 		return vec3(1.0, 0.2, 0.01);
 	} else if(riskView == 2.0 && sp_dist < 0.0 && class_id == 1.0) {
 		return vec3(1.0, 0.2, 0.01);
