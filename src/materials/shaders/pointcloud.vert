@@ -20,11 +20,13 @@ attribute vec4 indices;
 attribute vec2 uv;
 attribute float cqa_id;
 attribute float region_id;
+attribute float instance_id;
 attribute float class_id;
 attribute float encroachment;
 attribute float span_id;
 
 uniform float selected_cqa_id;
+uniform float customFilterMode;
 uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -133,6 +135,19 @@ varying vec3 vNormal;
 #ifdef highlight_point
 varying float vHighlight;
 #endif
+
+// ---------------------
+// Treeswift-specific functions
+// ---------------------
+
+// This color scheme is based off the 8-tier class system including low/high veg.
+vec3 treeswiftClassColors() {
+	float r = 5.4549625642669841e-1 + class_id * -1.2768649400420924e+0 + pow(class_id, 2.0) * 3.4067207360771506e-1 + pow(class_id, 3.0) * 1.1495894473683803e+0 + pow(class_id, 4.0) * -7.9118426922256535e-1 + pow(class_id, 5.0) * 1.9877772863723780e-1 + pow(class_id, 6.0) * -2.1932271228956492e-2 + pow(class_id, 7.0) * 8.9451447194285004e-4;
+	float g = 2.7211246394718180e-1 + class_id * 9.1800288433054322e-3 + pow(class_id, 2.0) * 2.0470920310450613e-1 + pow(class_id, 3.0) * 2.1046358075559990e-1 + pow(class_id, 4.0) * -1.9805661124909252e-1 + pow(class_id, 5.0) * 5.3284836574590627e-2 + pow(class_id, 6.0) * -5.9534967291909047e-3 + pow(class_id, 7.0) * 2.4090802976594136e-4;
+	float b = 3.2774002417972931e-2 + class_id * -1.1044730718793191e-1 + pow(class_id, 2.0) * 2.6260546184586503e-1 + pow(class_id, 3.0) * 1.8650311069674830e-1 + pow(class_id, 4.0) * -1.6679571382857369e-1 + pow(class_id, 5.0) * 4.2520392133702865e-2 + pow(class_id, 6.0) * -4.6001633962302188e-3 + pow(class_id, 7.0) * 1.8336834724092633e-4;
+
+	return vec3(r, g, b);
+}
 
 // ---------------------
 // OCTREE
@@ -326,29 +341,6 @@ vec3 getRGB() {
 	vec3 rgb = color;
 	#endif
 
-		// Unclassified
-	if(class_id == -1.0) {
-		return vec3(1.0, 0.0, 0.0);
-		// Other (probably ground) rgb(139,69,19)
-	} else if(class_id == 0.0) {
-		return vec3(0.55, 0.27, 0.07);
-		// Veg (probably tree) rgb(34,139,34)
-	} else if(class_id == 1.0) {
-		return vec3(0.133, 0.55, 0.133);
-	} else if(class_id == 2.0) {
-		// Wire rgb(34,139,34)
-		return vec3(0.98, 0.98, 0.94);
-	} else if(class_id == 3.0) {
-		// Pole rgb(255,248,220)
-		return vec3(1.0, 0.97, 0.86);
-	} else if(class_id == 4.0) {
-		// House rgb(70,130,180)
-		return vec3(0.274, 0.509, 0.705);
-	} else if(class_id == 5.0) {
-		// Noise rgb(72,61,139)
-		return vec3(0.282, 0.239, 0.545);
-	}
-
 	#if defined(use_rgb_gamma_contrast_brightness)
 	rgb = pow(rgb, vec3(rgbGamma));
 	rgb = rgb + rgbBrightness;
@@ -475,6 +467,8 @@ void main() {
 	vColor = getRGB();
 	#elif defined color_type_height
 	vColor = getElevation();
+	#elif defined color_type_custom
+	vColor = treeswiftClassColors();
 	#elif defined color_type_rgb_height
 	vec3 cHeight = getElevation();
 	vColor = (1.0 - transition) * getRGB() + transition * cHeight;
@@ -548,7 +542,11 @@ void main() {
 	}
 	#endif
 
-	if(class_id == 2.0) {
+	if(customFilterMode == 1.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0) {
+		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
+		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
+	} else if(customFilterMode == 2.0 && selected_cqa_id != instance_id) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }

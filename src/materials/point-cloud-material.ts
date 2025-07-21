@@ -113,6 +113,7 @@ export interface IPointCloudMaterialUniforms {
   stripeDivisorY: IUniform<number>;
   pointCloudMixingMode: IUniform<number>;
   selected_cqa_id: IUniform<number>;
+  customFilterMode: IUniform<number>;
 }
 
 const TREE_TYPE_DEFS = {
@@ -153,6 +154,7 @@ const COLOR_DEFS = {
   [PointColorType.PHONG]: 'color_type_phong',
   [PointColorType.RGB_HEIGHT]: 'color_type_rgb_height',
   [PointColorType.COMPOSITE]: 'color_type_composite',
+  [PointColorType.CUSTOM]: 'color_type_custom',
 };
 
 const CLIP_MODE_DEFS = {
@@ -248,6 +250,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
     stripeDivisorY: makeUniform('f', 2),
     pointCloudMixAngle: makeUniform('f', 31),
     selected_cqa_id: makeUniform('f', 0),
+    customFilterMode: makeUniform('f', 0),
   };
 
   @uniform('bbSize') bbSize!: [number, number, number];

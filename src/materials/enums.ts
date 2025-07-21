@@ -38,6 +38,7 @@ export enum PointColorType {
   PHONG = 12,
   RGB_HEIGHT = 13,
   COMPOSITE = 50,
+  CUSTOM = 51,
 }
 
 export enum NormalFilteringMode {
