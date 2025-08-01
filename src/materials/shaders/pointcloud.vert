@@ -23,6 +23,7 @@ attribute float region_id;
 attribute float instance_id;
 attribute float class_id;
 attribute float encroachment;
+attribute float sp_dist;
 attribute float span_id;
 
 uniform float selected_cqa_id;
@@ -74,6 +75,8 @@ uniform float wElevation;
 uniform float wClassification;
 uniform float wReturnNumber;
 uniform float wSourceID;
+uniform float riskView;
+uniform float riskSeverity;
 
 uniform sampler2D visibleNodes;
 uniform sampler2D gradient;
@@ -140,8 +143,45 @@ varying float vHighlight;
 // Treeswift-specific functions
 // ---------------------
 
-// This color scheme is based off the 8-tier class system including low/high veg.
 vec3 treeswiftClassColors() {
+	bool isTreePoint = class_id == 1.0 || class_id == 7.0 || class_id == 8.0;
+	#if defined(selectable_region_id)
+	// We almost never want to color the whole region one color.
+	// if(selected_cqa_id == region_id) {
+	// 	return vec3(1.0, .0, .0);
+	// }
+	#elif defined(selectable_instance_id)
+	if(riskView == 0.0 && instance_id == selected_cqa_id) {
+		return vec3(0.31, 0.21, 0.87);
+	}
+	#elif defined(selectable_cqa_id)
+	if(selected_cqa_id == cqa_id) {
+		return vec3(1.0, .0, .0);
+	}
+	#endif
+
+	// RiskView-specific coloring. Only TreePoints can be risky, so only TreePoints are colored here.
+	// Regions have instances, so they don't need to be specifically handled here (we show all risks in the region/neighboring regions regardless)
+	// CQA implicitly is all risk, so it doesn't need handling here.
+	#if defined(selectable_instance_id) || defined(selectable_instance_id)
+	if(riskView == 1.0 && isTreePoint) {
+		if(encroachment < riskSeverity && instance_id == selected_cqa_id) {
+			return vec3(1.0, 0.0, 0.0);
+		} else if(encroachment < riskSeverity) {
+			return vec3(1.0, 0.00, 0.09);
+		}
+	} else if(riskView == 2.0 && isTreePoint) {
+		if(sp_dist < 0.0 && class_id == 1.0 && instance_id == selected_cqa_id) {
+			return vec3(1.0, 0.2, 0.01);
+		} else if(sp_dist < 0.0 && class_id == 1.0) {
+			return vec3(1.0, 0.2, 0.01);
+		} else if(span_id > 0.0) {
+			return vec3(0.0, 0.0, 0.94);
+		}
+	}
+	#endif
+
+	// This color scheme is based off the 8-tier class system including low/high veg.
 	float r = 5.4549625642669841e-1 + class_id * -1.2768649400420924e+0 + pow(class_id, 2.0) * 3.4067207360771506e-1 + pow(class_id, 3.0) * 1.1495894473683803e+0 + pow(class_id, 4.0) * -7.9118426922256535e-1 + pow(class_id, 5.0) * 1.9877772863723780e-1 + pow(class_id, 6.0) * -2.1932271228956492e-2 + pow(class_id, 7.0) * 8.9451447194285004e-4;
 	float g = 2.7211246394718180e-1 + class_id * 9.1800288433054322e-3 + pow(class_id, 2.0) * 2.0470920310450613e-1 + pow(class_id, 3.0) * 2.1046358075559990e-1 + pow(class_id, 4.0) * -1.9805661124909252e-1 + pow(class_id, 5.0) * 5.3284836574590627e-2 + pow(class_id, 6.0) * -5.9534967291909047e-3 + pow(class_id, 7.0) * 2.4090802976594136e-4;
 	float b = 3.2774002417972931e-2 + class_id * -1.1044730718793191e-1 + pow(class_id, 2.0) * 2.6260546184586503e-1 + pow(class_id, 3.0) * 1.8650311069674830e-1 + pow(class_id, 4.0) * -1.6679571382857369e-1 + pow(class_id, 5.0) * 4.2520392133702865e-2 + pow(class_id, 6.0) * -4.6001633962302188e-3 + pow(class_id, 7.0) * 1.8336834724092633e-4;

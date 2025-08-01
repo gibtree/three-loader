@@ -46,6 +46,7 @@ import {
   generateGradientTexture,
 } from './texture-generation';
 import { IClassification, IGradient, IUniform } from './types';
+import { Selectable } from './selectable';
 
 export interface IPointCloudMaterialParameters {
   size: number;
@@ -165,6 +166,12 @@ const CLIP_MODE_DEFS = {
   [ClipMode.HIGHLIGHT_INSIDE]: 'clip_highlight_inside',
   [ClipMode.CLIP_HORIZONTALLY]: 'clip_horizontally',
   [ClipMode.CLIP_VERTICALLY]: 'clip_vertically',
+};
+
+const SELECTABLE_MODE_DEFS = {
+  [Selectable.REGION_ID]: 'selectable_region_id',
+  [Selectable.INSTANCE_ID]: 'selectable_instance_id',
+  [Selectable.CQA_ID]: 'selectable_cqa_id',
 };
 
 export class PointCloudMaterial extends RawShaderMaterial {
@@ -307,6 +314,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @requiresShaderUpdate() pointColorType: PointColorType = PointColorType.RGB;
   @requiresShaderUpdate() pointSizeType: PointSizeType = PointSizeType.ADAPTIVE;
   @requiresShaderUpdate() clipMode: ClipMode = ClipMode.DISABLED;
+  @requiresShaderUpdate() selectableMode: Selectable = Selectable.INSTANCE_ID;
   @requiresShaderUpdate() useEDL: boolean = false;
   @requiresShaderUpdate() shape: PointShape = PointShape.SQUARE;
   @requiresShaderUpdate() treeType: TreeType = TreeType.OCTREE;
@@ -430,6 +438,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
     define(SHAPE_DEFS[this.shape]);
     define(COLOR_DEFS[this.pointColorType]);
     define(CLIP_MODE_DEFS[this.clipMode]);
+    define(SELECTABLE_MODE_DEFS[this.selectableMode]);
     define(OPACITY_DEFS[this.pointOpacityType]);
 
     // We only perform gamma and brightness/contrast calculations per point if values are specified.
