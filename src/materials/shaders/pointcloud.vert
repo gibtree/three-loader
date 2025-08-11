@@ -163,7 +163,7 @@ vec3 treeswiftClassColors() {
 	// RiskView-specific coloring. Only TreePoints can be risky, so only TreePoints are colored here.
 	// Regions have instances, so they don't need to be specifically handled here (we show all risks in the region/neighboring regions regardless)
 	// CQA implicitly is all risk, so it doesn't need handling here.
-	#if defined(selectable_instance_id) || defined(selectable_instance_id)
+	#if defined(selectable_region_id) || defined(selectable_instance_id)
 	if(riskView == 1.0 && isTreePoint) {
 		if(encroachment < riskSeverity && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.0, 0.0);
@@ -171,12 +171,10 @@ vec3 treeswiftClassColors() {
 			return vec3(1.0, 0.00, 0.09);
 		}
 	} else if(riskView == 2.0 && isTreePoint) {
-		if(sp_dist < 0.0 && class_id == 1.0 && instance_id == selected_cqa_id) {
+		if(sp_dist < 0.0 && isTreePoint && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.2, 0.01);
-		} else if(sp_dist < 0.0 && class_id == 1.0) {
+		} else if(sp_dist < 0.0 && isTreePoint) {
 			return vec3(1.0, 0.2, 0.01);
-		} else if(span_id > 0.0) {
-			return vec3(0.0, 0.0, 0.94);
 		}
 	}
 	#endif
