@@ -25,6 +25,7 @@ attribute float class_id;
 attribute float encroachment;
 attribute float sp_dist;
 attribute float span_id;
+attribute float oh_dist;
 
 uniform float selected_cqa_id;
 uniform float customFilterMode;
@@ -176,7 +177,13 @@ vec3 treeswiftClassColors() {
 		} else if(sp_dist < 0.0 && isTreePoint) {
 			return vec3(1.0, 0.2, 0.01);
 		}
-	}
+	} else if(riskView == 3.0 && isTreePoint) {
+		if(oh_dist > 0.0 && instance_id == selected_cqa_id) {
+			return vec3(1.0, 0.2, 0.00);
+		} else if(oh_dist > 0.0) {
+			return vec3(1.0, 0.2, 0.09);
+		}
+	} 
 	#endif
 
 	// This color scheme is based off the 8-tier class system including low/high veg.
