@@ -178,9 +178,9 @@ vec3 treeswiftClassColors() {
 			return vec3(1.0, 0.2, 0.01);
 		}
 	} else if(riskView == 3.0 && isTreePoint) {
-		if(oh_dist < 20000.0 && instance_id == selected_cqa_id) {
+		if(oh_dist > 0.0 && oh_dist < 20000.0 && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.2, 0.00);
-		} else if(oh_dist > 0.0) {
+		} else if(oh_dist > 0.0 && oh_dist < 20000.0) {
 			return vec3(1.0, 0.2, 0.09);
 		}
 	} 
