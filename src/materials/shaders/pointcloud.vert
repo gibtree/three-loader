@@ -183,7 +183,11 @@ vec3 treeswiftClassColors() {
 		} else if(oh_dist > 0.0 && oh_dist < 20000.0) {
 			return vec3(1.0, 0.2, 0.09);
 		}
-	} 
+	}
+
+	if(span_id > 0.0) {
+		return vec3(0, 1.0, 0);
+	}
 	#endif
 
 	// This color scheme is based off the 8-tier class system including low/high veg.
@@ -591,7 +595,7 @@ void main() {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	} else if(customFilterMode == 2.0 && selected_cqa_id != instance_id) {
+	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }
