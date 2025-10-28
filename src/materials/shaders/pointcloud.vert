@@ -186,7 +186,7 @@ vec3 treeswiftClassColors() {
 	}
 
 	if(span_id > 0.0) {
-		return vec3(0, 1.0, 0);
+		return vec3(0, 0.0, 1.0);
 	}
 	#endif
 
