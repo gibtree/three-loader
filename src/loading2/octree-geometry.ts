@@ -18,6 +18,12 @@ export class OctreeGeometry {
 	scale!: [number, number, number];
 	spacing: number = 0;
 	url: string | null = null;
+	tile_definition?: {
+		epsg: number;
+		size: number;
+		i: number;
+		j: number;
+	} = undefined;
 
 	constructor(
 		public loader: NodeLoader,

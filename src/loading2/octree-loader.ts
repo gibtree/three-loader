@@ -373,6 +373,12 @@ export interface Metadata {
 	};
 	encoding: string;
 	attributes: Attribute[];
+	tile_definition: {
+		epsg: number;
+		size: number;
+		i: number;
+		j: number;
+	}
 }
 
 export class OctreeLoader {
@@ -523,6 +529,7 @@ export class OctreeLoader {
 		octree.tightBoundingBox = this.getTightBoundingBox(metadata);
 		octree.offset = offset;
 		octree.pointAttributes = attributes;
+		octree.tile_definition = metadata.tile_definition;
 		return octree;
 	}
 	
