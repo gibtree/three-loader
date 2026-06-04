@@ -595,7 +595,7 @@ void main() {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id) {
+	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id && span_id <= 0.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }
