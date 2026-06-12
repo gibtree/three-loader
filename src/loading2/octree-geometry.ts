@@ -36,6 +36,10 @@ export class OctreeGeometry {
 
 	dispose(): void {
 		this.root.traverse((node) => node.dispose());
+		// Terminate the worker threads owned by this point cloud's loader.
+		// The pool is created per-load (one OctreeLoader -> one WorkerPool),
+		// so nothing else shares these workers.
+		this.loader.workerPool.terminate();
 		this.disposed = true;
 	}
 

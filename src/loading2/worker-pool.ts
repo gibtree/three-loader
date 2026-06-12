@@ -32,6 +32,11 @@ function createWorker(type: WorkerType): Worker {
 export class WorkerPool {
 	// Workers will be an object that has a key for each worker type and the value is an array of Workers that can be empty
 	private workers: { [key in WorkerType]: Worker[] } = {DECODER_WORKER: [], DECODER_WORKER_GLTF: [], DECODER_WORKER_BROTLI: []};
+	// Workers that have been handed out via getWorker() and not yet returned.
+	// Tracked so terminate() can also kill in-flight workers, which are not
+	// present in the idle `workers` arrays.
+	private active: Set<Worker> = new Set();
+	private terminated: boolean = false;
 
 	getWorker(workerType: WorkerType): Worker {
 		// Throw error if workerType is not recognized
@@ -47,11 +52,36 @@ export class WorkerPool {
 		if (worker === undefined) { // Typescript needs this
 			throw new Error('No workers available');
 		}
+		this.active.add(worker);
 		// Return the last worker in the array and remove it from the array
 		return worker;
 	}
 
 	returnWorker(workerType: WorkerType, worker: Worker) {
+		this.active.delete(worker);
+		// If the pool was terminated while this worker was in flight, kill it
+		// instead of returning it to the idle pool.
+		if (this.terminated) {
+			worker.terminate();
+			return;
+		}
 		this.workers[workerType].push(worker);
+	}
+
+	// Terminate every worker owned by this pool (both idle and in-flight) and
+	// empty the pool. Call this when the owning point cloud is disposed so the
+	// underlying worker threads are released rather than orphaned.
+	terminate() {
+		this.terminated = true;
+		for (const workerType of Object.keys(this.workers) as WorkerType[]) {
+			for (const worker of this.workers[workerType]) {
+				worker.terminate();
+			}
+			this.workers[workerType] = [];
+		}
+		for (const worker of this.active) {
+			worker.terminate();
+		}
+		this.active.clear();
 	}
 }

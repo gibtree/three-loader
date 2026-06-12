@@ -105,10 +105,18 @@ export class NodeLoader {
 
 			worker.onmessage = (e) => {
 
+				this.workerPool.returnWorker(workerType, worker);
+
+				// The point cloud may have been disposed while this node was in
+				// flight; if so, drop the result instead of attaching geometry
+				// to a dead octree.
+				if (node.octreeGeometry.disposed) {
+					node.loading = false;
+					return;
+				}
+
 				const data = e.data;
 				const buffers = data.attributeBuffers;
-
-				this.workerPool.returnWorker(workerType, worker);
 
 				const geometry = new BufferGeometry();
 
