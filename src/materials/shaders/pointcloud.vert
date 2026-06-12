@@ -25,6 +25,7 @@ attribute float class_id;
 attribute float encroachment_20;
 attribute float sp_dist_20;
 attribute float span_id;
+attribute float wire_type;
 attribute float oh_dist_20;
 
 uniform float selected_cqa_id;
@@ -185,8 +186,12 @@ vec3 treeswiftClassColors() {
 		}
 	}
 
-	if(span_id > 0.0) {
-		return vec3(0, 0.0, 1.0);
+	if(wire_type == 10. || wire_type == 20.) {
+		return vec3(1.0, 1.0, 1.0);
+	} else if(wire_type == 11. || wire_type == 21. || wire_type == 30. || wire_type == 52.) {
+		return vec3(0.5, 0.5, .5);
+	} else if(wire_type >= 0.0) {
+		return vec3(.98, 0.98, .98);
 	}
 	#endif
 
@@ -595,7 +600,7 @@ void main() {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 3.0 && selected_cqa_id != instance_id && span_id < 0.0) {
+	} else if(customFilterMode == 2.0 && class_id != 0.0 && selected_cqa_id != instance_id && wire_type < 0.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }

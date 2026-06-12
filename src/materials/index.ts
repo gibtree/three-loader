@@ -1,5 +1,6 @@
 export * from './blur-material';
 export * from './clipping';
+export * from './edl-material';
 export * from './enums';
 export * from './point-cloud-material';
 export * from './texture-generation';
