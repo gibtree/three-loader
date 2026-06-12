@@ -417,7 +417,9 @@ export class OctreeLoader {
 
 			const potreeAttributeName = replacements[name] ? replacements[name] : name;
 
-			const attribute = new PointAttribute(potreeAttributeName, type, numElements);
+			const potreeAttributeNameSafe = potreeAttributeName.replace('-', '_');
+
+			const attribute = new PointAttribute(potreeAttributeNameSafe, type, numElements);
 
 			if (bufferView) {
 				attribute.uri = bufferView.uri;
