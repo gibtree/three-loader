@@ -190,7 +190,7 @@ vec3 treeswiftClassColors() {
 		return vec3(1.0, 1.0, 1.0);
 	} else if(wire_type == 11. || wire_type == 21. || wire_type == 30. || wire_type == 52.) {
 		return vec3(0.5, 0.5, .5);
-	} else if(wire_type >= 0.0) {
+	} else if(wire_type > 0.0) {
 		return vec3(.98, 0.98, .98);
 	}
 	#endif
