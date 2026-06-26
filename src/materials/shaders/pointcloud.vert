@@ -187,10 +187,10 @@ vec3 treeswiftClassColors() {
 	}
 
 	if(wire_type == 10. || wire_type == 20.) {
-		return vec3(1.0, 1.0, 1.0);
+		return vec3(0.0, 0.0, 1.0);
 	} else if(wire_type == 11. || wire_type == 21. || wire_type == 30. || wire_type == 52.) {
 		return vec3(0.5, 0.5, .5);
-	} else if(wire_type > 0.0) {
+	} else if(wire_type >= 0.0) {
 		return vec3(.98, 0.98, .98);
 	}
 	#endif
@@ -452,6 +452,10 @@ void main() {
 	pointSize = worldSpaceSize * projFactor;
 	#endif
 
+	if(wire_type >= 0.) {
+		pointSize = 9.0;
+	}
+
 	pointSize = max(minSize, pointSize);
 	pointSize = min(maxSize, pointSize);
 
@@ -600,7 +604,8 @@ void main() {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	} else if(customFilterMode == 2.0 && class_id != 0.0 && selected_cqa_id != instance_id && wire_type <= 0.0) {
+	// Hide veg that's not the selected veg, but show ground and wires.
+	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id && wire_type <= 0.0) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }
