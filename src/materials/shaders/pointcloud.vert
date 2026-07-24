@@ -600,12 +600,13 @@ void main() {
 	}
 	#endif
 
-	if(customFilterMode == 1.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0) {
-		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	} else if(customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0) {
-		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
-	// Hide veg that's not the selected veg, but show ground and wires.
-	} else if(customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id && wire_type <= 0.0) {
+	// Refer to: https://app.notion.com/p/Point-Cloud-Datasets-a9cfd579f5f94338830e3e7778247e2f
+	bool FILTER_NONE = customFilterMode == 0.0 && class_id == 5.0; // Customer, hides noise but shows everything else.
+	bool FILTER_HIDE_NON_WIRE = customFilterMode == 1.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0; // Wire QA, shows only wire, pole, and ground.
+	bool FILTER_HIDE_NON_SELECTED = customFilterMode == 2.0 && class_id != 0.0 && class_id != 2.0 && class_id != 3.0 && selected_cqa_id != instance_id && wire_type <= 0.0; // Customer, shows only selected veg, wires, ground.
+	bool FILTER_HIDE_NON_WIRE_AND_GROUND = customFilterMode == 3.0 && class_id != 2.0 && class_id != 3.0; // Customer, construction. Shows only poles and wires.
+
+	if(FILTER_NONE || FILTER_HIDE_NON_WIRE || FILTER_HIDE_NON_SELECTED || FILTER_HIDE_NON_WIRE_AND_GROUND) {
 		gl_Position = vec4(1000.0, 1000.0, 1000.0, 1.0);
 	}
 }
