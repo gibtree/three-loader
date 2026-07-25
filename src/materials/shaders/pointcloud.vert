@@ -22,11 +22,11 @@ attribute float cqa_id;
 attribute float region_id;
 attribute float instance_id;
 attribute float class_id;
-attribute float encroachment_20;
-attribute float sp_dist_20;
+attribute float encroachment_SINGLE_WIRE_TYPE_;
+attribute float sp_dist_SINGLE_WIRE_TYPE_;
+attribute float oh_dist_SINGLE_WIRE_TYPE_;
 attribute float span_id;
 attribute float wire_type;
-attribute float oh_dist_20;
 
 uniform float selected_cqa_id;
 uniform float customFilterMode;
@@ -167,21 +167,21 @@ vec3 treeswiftClassColors() {
 	// CQA implicitly is all risk, so it doesn't need handling here.
 	#if defined(selectable_region_id) || defined(selectable_instance_id)
 	if(riskView == 1.0 && isTreePoint) {
-		if(encroachment_20 < riskSeverity && instance_id == selected_cqa_id) {
+		if(encroachment_SINGLE_WIRE_TYPE_ < riskSeverity && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.0, 0.0);
-		} else if(encroachment_20 < riskSeverity) {
+		} else if(encroachment_SINGLE_WIRE_TYPE_ < riskSeverity) {
 			return vec3(1.0, 0.00, 0.09);
 		}
 	} else if(riskView == 2.0 && isTreePoint) {
-		if(sp_dist_20 < 0.0 && isTreePoint && instance_id == selected_cqa_id) {
+		if(sp_dist_SINGLE_WIRE_TYPE_ < 0.0 && isTreePoint && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.2, 0.01);
-		} else if(sp_dist_20 < 0.0 && isTreePoint) {
+		} else if(sp_dist_SINGLE_WIRE_TYPE_ < 0.0 && isTreePoint) {
 			return vec3(1.0, 0.2, 0.01);
 		}
 	} else if(riskView == 3.0 && isTreePoint) {
-		if(oh_dist_20 > 0.0 && oh_dist_20 < 20000.0 && instance_id == selected_cqa_id) {
+		if(oh_dist_SINGLE_WIRE_TYPE_ > 0.0 && oh_dist_SINGLE_WIRE_TYPE_ < 20000.0 && instance_id == selected_cqa_id) {
 			return vec3(1.0, 0.2, 0.00);
-		} else if(oh_dist_20 > 0.0 && oh_dist_20 < 20000.0) {
+		} else if(oh_dist_SINGLE_WIRE_TYPE_ > 0.0 && oh_dist_SINGLE_WIRE_TYPE_ < 20000.0) {
 			return vec3(1.0, 0.2, 0.09);
 		}
 	}
